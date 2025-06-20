@@ -343,16 +343,6 @@ def convert_to_ascii(
     }
     interesting = interesting_labeled.keys()
 
-    if img.mode == "P":
-        # img = img.convert("RGBA") # actually, is this a lot slower?
-
-        _debug_print("Image is in palette mode (P).")
-        # palette = _WrappedPalette.from_image(img)
-        # palette[189] = 255
-        # palette[190] = 0
-        # palette[191] = 255
-        # img.putpalette(palette._palette)
-
     x_grid_size = original_width / new_width
     y_grid_size = original_height / new_height
 
@@ -393,6 +383,9 @@ def convert_to_ascii(
     # for debugging, make a copy to draw on and load the font
     if DEBUG:
         debug_image = img.copy()
+        if debug_image.mode == "P":
+            # convert to RGBA for drawing
+            debug_image = debug_image.convert("RGBA")
         draw = ImageDraw.Draw(debug_image)
         font = ImageFont.load_default()
 
@@ -763,11 +756,6 @@ def preview_alphabets(args):
 
 
 def convert_to_ascii_with_args(args):
-    if args.debug:
-        global DEBUG
-        DEBUG = True
-        _debug_print("Debug mode is enabled.")
-
     return convert_to_ascii(
         args.image_path,
         alphabet_name=args.alphabet,

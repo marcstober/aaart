@@ -2,8 +2,14 @@
 # which also mentions [typer] and [docopt] packages to make CLI's, but I'm using argparse myself.
 
 import argparse
-from . import aart
-from .aart import _debug_print, alphabets, convert_to_ascii_with_args, preview_alphabets
+
+from .aart import (
+    DEBUG,
+    _debug_print,
+    alphabets,
+    convert_to_ascii_with_args,
+    preview_alphabets,
+)
 
 
 def main():
@@ -33,8 +39,8 @@ def main():
     args = parser.parse_args()
 
     if args.debug:
-        aart.DEBUG
-        aart._debug_print("Debug mode is enabled.")
+        DEBUG = True
+        _debug_print("Debug mode is enabled.")
 
     if args.alphabet == "__all__":
         preview_alphabets(args)
