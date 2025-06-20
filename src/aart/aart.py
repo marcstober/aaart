@@ -8,12 +8,13 @@ from typing import Iterable
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-# TODO: package (open-source/pip installable?)
 # TODO: figment text
-# TODO: mode not color-mode
 # TODO: how does the JS version get the grayscale value of a colored pixel? (I think I did this)
-# TODO: colored monotone and other duotone modes
+# TODO: open-source?
 # TODO: cf. other Python options?
+# TODO: colored monotone and other duotone modes
+# TODO: Faster performance with RGB-mode images. (Maybe scale down first,
+#   to something like 4x size?)
 # TODO? "art" (not image or text?) - but some is inappropriate for kids
 # TODO: other options like posterize, stipple, lineart from Khrome's ascii-art
 # TODO: invert option
@@ -25,8 +26,6 @@ from PIL import Image, ImageDraw, ImageFont
 # TODO: A conceptual issue is that in true color mode, we both change the letter
 #   when the color is less bright, and the color itself, so the range of brightness is more than it should be.
 #   Maybe this is just a quirk of making ASCII art, the point is to be "lo-fi."
-# TODO: Faster performance with RGB-mode images. (Maybe scale down first,
-#   to something like 4x size?)
 
 DEBUG = False
 
@@ -74,15 +73,15 @@ def enhance_gamma_value(value, max_value=255, gamma=0.2):
 
 
 def map_rgb_value(value: Iterable[numbers.Number], alphabet_name="grayscale-chars"):
-    v = _map_value(value, alphabet_name=alphabet_name, color_mode="true-color")
+    v = _map_value(value, alphabet_name=alphabet_name, mode="color")
     return v
 
 
 def map_value(value, alphabet_name="grayscale-chars"):
-    return _map_value(value, alphabet_name=alphabet_name, color_mode="monotone")
+    return _map_value(value, alphabet_name=alphabet_name, mode="monotone")
 
 
-def _map_value(value, alphabet_name, color_mode):
+def _map_value(value, alphabet_name, mode):
     """
     Map a pixel value (0-255) to a character in the grayscale_chars string.
     """
@@ -90,12 +89,12 @@ def _map_value(value, alphabet_name, color_mode):
     alphabet: str = alphabets[alphabet_name]
     scale = 256 / len(alphabet)
 
-    if color_mode == "monotone":
+    if mode == "monotone":
         grayscale_value = int(value)
         # ensure value is integer (calling code may pass numpy.uint8)
         grayscale_value = int(value)
         return alphabet[round(min(grayscale_value / scale, len(alphabet) - 1))]
-    elif color_mode == "true-color":
+    elif mode == "color":
         int_rgb_values = tuple(map(int, value))
         grayscale_value = int(
             (int_rgb_values[0] + int_rgb_values[1] + int_rgb_values[2]) / 3
@@ -103,7 +102,7 @@ def _map_value(value, alphabet_name, color_mode):
         char = alphabet[round(min(grayscale_value / scale, len(alphabet) - 1))]
         return f"\033[38;2;{int_rgb_values[0]};{int_rgb_values[1]};{int_rgb_values[2]}m{char}"
     else:
-        raise ValueError(f"Unsupported color mode: {color_mode}")
+        raise ValueError(f"Unsupported mode: {mode}")
 
 
 def calculate_new_size(width, height, max_width, max_height, character_aspect_ratio):
@@ -260,7 +259,7 @@ class _WrappedPalette:
 @profile  # type: ignore
 def convert_to_ascii(
     image_path,
-    color_mode="monotone",
+    mode="monotone",
     alphabet_name="variant2",
     # output_file="ascii_image.txt",
     width=None,  # target width in characters
@@ -276,7 +275,7 @@ def convert_to_ascii(
 
     _debug_print("Image has transparency:", has_transparency(img))
 
-    if color_mode == "monotone":
+    if mode == "monotone":
         img = img.convert("L")  # convert to grayscale
     # elif img.mode != "RGB":
     #     #     # convert anything else (palette-based GIF, RGBA, etc.) to RGB
@@ -713,11 +712,11 @@ def convert_to_ascii(
     for row in pixel_array:
         line = []
         for pixel in row:
-            match color_mode:
+            match mode:
                 case "monotone":
                     # _debug_print("pixel is", pixel, type(pixel))
                     line.append(map_value(pixel, alphabet_name=alphabet_name))
-                case "true-color":
+                case "color":
                     if new_image.mode == "P":
                         assert new_image_palette is not None
                         # if the image is in palette mode, get the RGB value from the palette
@@ -725,7 +724,7 @@ def convert_to_ascii(
                         pixel = new_image_palette.get_color(pixel)
                     line.append(map_rgb_value(pixel, alphabet_name=alphabet_name))
                 case _:
-                    raise ValueError(f"Unsupported color mode: {color_mode}")
+                    raise ValueError(f"Unsupported mode: {mode}")
         line = "".join(line)
         f.write(line + "\n")
     f.write("\033[0m")  # reset color
@@ -759,5 +758,5 @@ def convert_to_ascii_with_args(args):
     return convert_to_ascii(
         args.image_path,
         alphabet_name=args.alphabet,
-        color_mode=args.color_mode,
+        mode=args.mode,
     )

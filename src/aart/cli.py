@@ -26,8 +26,8 @@ def main():
         help="Choose the ASCII alphabet to use (default: variant2)",
     )
     parser.add_argument(
-        "--color-mode",
-        choices=["monotone", "true-color"],
+        "--mode",
+        choices=["monotone", "color"],
         default="monotone",
         help="Choose the color mode (default: monotone)",
     )

@@ -44,7 +44,7 @@ def test_convert_to_ascii_with_unsupported_mode(tmp_path):
     create_test_image(img_path)
 
     with pytest.raises(ValueError):
-        aart.convert_to_ascii(str(img_path), color_mode="unsupported")
+        aart.convert_to_ascii(str(img_path), mode="unsupported")
 
 
 def test_convert_to_ascii_calls_map_value_with_alphabet_name(monkeypatch, tmp_path):
@@ -54,7 +54,7 @@ def test_convert_to_ascii_calls_map_value_with_alphabet_name(monkeypatch, tmp_pa
 
     called = {}
 
-    def fake_map_value(value, alphabet_name="grayscale-chars", color_mode="monotone"):
+    def fake_map_value(value, alphabet_name="grayscale-chars", mode="monotone"):
         called["alphabet_name"] = alphabet_name
         # Return a dummy character
         return "X"
@@ -69,7 +69,7 @@ def test_convert_to_ascii_calls_map_value_with_alphabet_name(monkeypatch, tmp_pa
     assert called["alphabet_name"] == alphabet
 
 
-def test_convert_to_ascii_with_color_mode_true_color(monkeypatch, tmp_path):
+def test_convert_to_ascii_with_mode_color(monkeypatch, tmp_path):
     # Create a test image
     img_path = tmp_path / "test_img.png"
     create_test_image(img_path)
@@ -85,8 +85,8 @@ def test_convert_to_ascii_with_color_mode_true_color(monkeypatch, tmp_path):
     # Patch map_value in aart
     monkeypatch.setattr(aart, "map_rgb_value", fake_map_rgb_value)
 
-    # Call convert_to_ascii with a specific color_mode
-    aart.convert_to_ascii(str(img_path), color_mode="true-color")
+    # Call convert_to_ascii with a specific mode
+    aart.convert_to_ascii(str(img_path), mode="color")
 
     # Check that the patched function was called
     assert was_called
@@ -156,7 +156,7 @@ def test_example_logo():
     # Convert the image to ASCII art and print to stdout
     aart.convert_to_ascii(
         R"tests\example-logo.gif",
-        color_mode="true-color",
+        mode="color",
         alphabet_name="ultra-wide",
         width=148,
         height=32,
@@ -184,6 +184,4 @@ def test_example_logo():
 
 def test_example_jpg():
     # this is just making sure this runs without error
-    aart.convert_to_ascii(
-        R"tests\pexels-creationhill-1681010.jpg", color_mode="true-color"
-    )
+    aart.convert_to_ascii(R"tests\pexels-creationhill-1681010.jpg", mode="color")
