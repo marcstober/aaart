@@ -7,18 +7,19 @@ from typing import Iterable
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+import pyfiglet
 
-# TODO: figment text
 # TODO: how does the JS version get the grayscale value of a colored pixel? (I think I did this)
+# TODO: see TODO about "naive" below
 # TODO: open-source?
 # TODO: cf. other Python options?
-# TODO: colored monotone and other duotone modes
 # TODO: Faster performance with RGB-mode images. (Maybe scale down first,
 #   to something like 4x size?)
 # TODO? "art" (not image or text?) - but some is inappropriate for kids
 # TODO: other options like posterize, stipple, lineart from Khrome's ascii-art
 # TODO: invert option
 # TODO: more color modes (8 bit, 4 bit, "standard" terminal colors, etc.)
+# TODO: other duotone modes
 # TODO: Despite a lot of work, some details are different than the JS version.
 #   See downsampled-with-node-js.png. In particular, the first line of text.
 #   Maybe we just got lucky with how it aligns to the pixel grid or something?
@@ -264,6 +265,7 @@ def convert_to_ascii(
     # output_file="ascii_image.txt",
     width=None,  # target width in characters
     height=None,  # target height in characters
+    colors=":",  # color to use in monotone mode
 ):
     img = Image.open(image_path)
 
@@ -382,7 +384,7 @@ def convert_to_ascii(
     # for debugging, make a copy to draw on and load the font
     if DEBUG:
         debug_image = img.copy()
-        if debug_image.mode == "P":
+        if debug_image.mode != "RGBA":
             # convert to RGBA for drawing
             debug_image = debug_image.convert("RGBA")
         draw = ImageDraw.Draw(debug_image)
@@ -707,6 +709,13 @@ def convert_to_ascii(
     if new_image.mode == "P":
         new_image_palette = _WrappedPalette.from_image(new_image)
 
+    # borrow color functionality from pyfiglet
+    ansiColors = None
+    if mode == "monotone":
+        ansiColors = pyfiglet.parse_color(colors)
+        if ansiColors:
+            f.write(ansiColors)
+
     # uncomment following line to write to a file:
     # with open(output_file, "w") as f:
     for row in pixel_array:
@@ -727,7 +736,8 @@ def convert_to_ascii(
                     raise ValueError(f"Unsupported mode: {mode}")
         line = "".join(line)
         f.write(line + "\n")
-    f.write("\033[0m")  # reset color
+    if mode == "color" or ansiColors:
+        f.write("\033[0m")  # reset color
 
 
 def draw_grid(img, width, height, new_width, new_height):
@@ -759,4 +769,5 @@ def convert_to_ascii_with_args(args):
         args.image_path,
         alphabet_name=args.alphabet,
         mode=args.mode,
+        colors=args.color,
     )

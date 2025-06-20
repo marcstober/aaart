@@ -3,13 +3,11 @@
 
 import argparse
 import shutil
-import sys
-from turtle import width
 
-from pyfiglet import Figlet
+import pyfiglet
 
+from . import image
 from .image import (
-    DEBUG,
     _debug_print,
     alphabets,
     convert_to_ascii_with_args,
@@ -51,6 +49,13 @@ def image_main(raw_args):
         default="monotone",
         help="Choose the color mode (default: monotone)",
     )
+    # the idea is to make this work like pyfiglet's --color argument
+    parser.add_argument(
+        "--color",
+        "-c",
+        default=":",
+        help="color to use in monotone mode",
+    )
     parser.add_argument(
         "--debug",
         action="store_true",
@@ -59,7 +64,7 @@ def image_main(raw_args):
     args = parser.parse_args(raw_args)
 
     if args.debug:
-        DEBUG = True
+        image.DEBUG = True
         _debug_print("Debug mode is enabled.")
 
     if args.alphabet == "__all__":
@@ -69,6 +74,7 @@ def image_main(raw_args):
 
 
 def text_main(raw_args):
+    # the arguments are *mostly* a subset of pyfiglet's
     parser = argparse.ArgumentParser(description="Convert text to ASCII art.")
     parser.add_argument("text", help="Text to convert to ASCII art", nargs="*")
     parser.add_argument(
@@ -91,33 +97,39 @@ def text_main(raw_args):
         action="store_true",
         help="show installed fonts list",
     )
-    # TODO: color
+    parser.add_argument(
+        "--color",
+        "-c",
+        default=":",  # default needed for pyfiglet
+        help="prints text with color",
+    )
     args = parser.parse_args(raw_args)
+
+    def render_text(args):
+        width = args.width
+        if not width:
+            width = shutil.get_terminal_size().columns
+        pyfiglet.print_figlet(
+            " ".join(args.text), font=args.font, colors=args.color, width=width
+        )
 
     if args.list_fonts:
         # TODO: just call pyfiglet's function?
-        fonts = Figlet().getFonts()
+        fonts = pyfiglet.Figlet().getFonts()
         print("Installed fonts:")
         for font in fonts:
             print(f"  {font}")
     if args.font == "__all__":
         # like the preview_alphabets function for images
         # TODO: this might be too many for the kids (how many are there?)
-        for font in Figlet().getFonts():
+        for font in pyfiglet.Figlet().getFonts():
             print("\033[2J\033[H", end="")  # clear the screen
-            width = args.width
-            if not width:
-                width = shutil.get_terminal_size().columns
-            f = Figlet(font=font, width=width)
-            print(f.renderText(" ".join(args.text)))
+            args.font = font
+            render_text(args)
             inp = input(
                 f"Showing '{font}' font. Press 'q' then ENTER to quit, or ENTER to continue..."
             )
             if inp == "q":
                 break
     else:
-        width = args.width
-        if not width:
-            width = shutil.get_terminal_size().columns
-        f = Figlet(font=args.font, width=width)
-        print(f.renderText(" ".join(args.text)))
+        render_text(args)

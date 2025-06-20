@@ -144,6 +144,25 @@ def test_enhance_gamma_value_midpoint():
     assert image.enhance_gamma_value(128, gamma=0.41) == 192
 
 
+def test_convert_to_ascii_with_monotone_color(tmp_path):
+    # Create a test image
+    img_path = tmp_path / "test_img.png"
+    create_test_image(img_path)
+
+    # Redirect stdout to capture output
+    old_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+
+    # Call convert_to_ascii with a specific mode
+    image.convert_to_ascii(str(img_path), colors="green")
+
+    # Get the output and restore stdout
+    ascii_output = sys.stdout.getvalue()
+    sys.stdout = old_stdout
+
+    assert "\033[32m" in ascii_output
+
+
 def test_logo():
     """
     This is more of an integration (end-to-end) test.
