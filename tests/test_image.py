@@ -2,10 +2,10 @@ import io
 import sys
 
 import numpy
-import pytest  # TODO: Why do be need this dependency instead of just using unittest? (I think Copilot added this.)
+import pytest
 from PIL import Image
 
-from aart import aart
+from aart import image as aart
 
 
 def create_test_image(path, size=(10, 10), color=128):
