@@ -144,7 +144,7 @@ def test_enhance_gamma_value_midpoint():
     assert aart.enhance_gamma_value(128, gamma=0.41) == 192
 
 
-def test_example_logo():
+def test_logo():
     """
     This is more of an integration (end-to-end) test.
     """
@@ -155,7 +155,7 @@ def test_example_logo():
 
     # Convert the image to ASCII art and print to stdout
     aart.convert_to_ascii(
-        R"tests\example-logo.gif",
+        R"tests\logo.gif",
         mode="color",
         alphabet_name="ultra-wide",
         width=148,
