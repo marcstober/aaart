@@ -1,3 +1,24 @@
+# Installing
+
+NOTE: This package currently not open source or published publicly (i.e., on PyPI).
+(If it were, we'd need to rename or namespace it as there actually is another project
+named aart.)
+
+```powershell
+pip install path/to/aart-version.whl
+```
+
+Replace the path and filename with that of the actual wheel file.
+
+# Building
+
+Using `uv`:
+
+```powershell
+# in the directory where the pyproject.toml file is
+uv build
+```
+
 # Testing
 
 ## Smoke test for developers
