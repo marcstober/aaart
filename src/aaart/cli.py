@@ -18,25 +18,20 @@ from .image import (
 
 
 def main():
-    if len(sys.argv) < 2:
-        print(
-            "Usage: aart <command> [options]\nCommands:"
-            "\n  text   Convert text to ASCII art"
-            "\n  image  (coming soon)"
-        )
-        sys.exit(1)
-    command = sys.argv[1]
-    sys.argv = [sys.argv[0]] + sys.argv[2:]
-    if command == "text":
-        text_main()
-    elif command == "image":
-        image_main()
-    else:
-        print(f"Unknown command: {command}")
-        sys.exit(1)
+    # TODO: Also use argparse for this?
+    parser = argparse.ArgumentParser()
+    parser.add_argument("command", choices=["text", "image"], help="Command to run")
+    parser.add_argument(
+        "args", nargs=argparse.REMAINDER, help="Arguments for the command"
+    )
+    args = parser.parse_args()
+    if args.command == "text":
+        text_main(args.args)
+    elif args.command == "image":
+        image_main(args.args)
 
 
-def image_main():
+def image_main(raw_args):
     # TODO: move this back into image.py?
     parser = argparse.ArgumentParser(description="Convert image to ASCII art.")
     parser.add_argument("image_path", help="Path to the input image file")
@@ -61,7 +56,7 @@ def image_main():
         action="store_true",
         help="Enable debug output",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(raw_args)
 
     if args.debug:
         DEBUG = True
@@ -73,11 +68,9 @@ def image_main():
         convert_to_ascii_with_args(args)
 
 
-def text_main():
+def text_main(raw_args):
     parser = argparse.ArgumentParser(description="Convert text to ASCII art.")
-    parser.add_argument(
-        "text", help="Text to convert to ASCII art", nargs="+", default="hello"
-    )
+    parser.add_argument("text", help="Text to convert to ASCII art", nargs="*")
     parser.add_argument(
         "--font",
         "-f",
@@ -99,7 +92,7 @@ def text_main():
         help="show installed fonts list",
     )
     # TODO: color
-    args = parser.parse_args()
+    args = parser.parse_args(raw_args)
 
     if args.list_fonts:
         # TODO: just call pyfiglet's function?

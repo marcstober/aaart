@@ -1,11 +1,9 @@
 # Installing
 
 NOTE: This package currently not open source or published publicly (i.e., on PyPI).
-(If it were, we'd need to rename or namespace it as there actually is another project
-named aart.)
 
 ```powershell
-pip install path/to/aart-version.whl
+pip install path/to/aaart-version.whl
 ```
 
 Replace the path and filename with that of the actual wheel file.
@@ -26,7 +24,7 @@ uv build
 ```powershell
 # in the directory where the pyproject.toml file is
 pip install -e .
-aart image .\tests\logo.gif
+aaart image .\tests\logo.gif
 ```
 
 Run automated tests:

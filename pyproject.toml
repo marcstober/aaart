@@ -1,5 +1,5 @@
 [project]
-name = "aart"
+name = "aaart"
 version = "0.2.0"
 description = "Add your description here"
 readme = "README.md"
@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-aart = "aart:main"
+aaart = "aaart:main"
 
 [build-system]
 requires = ["hatchling"]

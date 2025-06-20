@@ -5,7 +5,7 @@ import numpy
 import pytest
 from PIL import Image
 
-from aart import image as aart
+from aaart import image
 
 
 def create_test_image(path, size=(10, 10), color=128):
@@ -15,25 +15,25 @@ def create_test_image(path, size=(10, 10), color=128):
 
 def test_convert_to_ascii_handles_nonexistent_file():
     with pytest.raises(FileNotFoundError):
-        aart.convert_to_ascii("nonexistent.png", "out.txt")
+        image.convert_to_ascii("nonexistent.png", "out.txt")
 
 
 def test_map_value_0():
-    assert aart.map_value(0) == " "
+    assert image.map_value(0) == " "
 
 
 def test_map_value_255():
-    assert aart.map_value(255) == "@"
+    assert image.map_value(255) == "@"
 
 
 def test_map_value_solid():
     value = numpy.uint8(128)
-    assert aart.map_value(value, alphabet_name="solid") == "█"
+    assert image.map_value(value, alphabet_name="solid") == "█"
 
 
 def test_map_rgb_value():
     value = numpy.array([128, 128, 128], dtype=numpy.uint8)
-    assert aart.map_rgb_value(value).startswith(
+    assert image.map_rgb_value(value).startswith(
         "\033[38;2;"  # ANSI escape code for RGB color
     )
 
@@ -44,7 +44,7 @@ def test_convert_to_ascii_with_unsupported_mode(tmp_path):
     create_test_image(img_path)
 
     with pytest.raises(ValueError):
-        aart.convert_to_ascii(str(img_path), mode="unsupported")
+        image.convert_to_ascii(str(img_path), mode="unsupported")
 
 
 def test_convert_to_ascii_calls_map_value_with_alphabet_name(monkeypatch, tmp_path):
@@ -59,12 +59,12 @@ def test_convert_to_ascii_calls_map_value_with_alphabet_name(monkeypatch, tmp_pa
         # Return a dummy character
         return "X"
 
-    # Patch map_value in aart
-    monkeypatch.setattr(aart, "map_value", fake_map_value)
+    # Patch map_value in image
+    monkeypatch.setattr(image, "map_value", fake_map_value)
 
     # Call convert_to_ascii with a specific alphabet_name
     alphabet = "foo"
-    aart.convert_to_ascii(str(img_path), alphabet_name=alphabet)
+    image.convert_to_ascii(str(img_path), alphabet_name=alphabet)
 
     assert called["alphabet_name"] == alphabet
 
@@ -82,11 +82,11 @@ def test_convert_to_ascii_with_mode_color(monkeypatch, tmp_path):
         # Return a dummy character
         return "X"
 
-    # Patch map_value in aart
-    monkeypatch.setattr(aart, "map_rgb_value", fake_map_rgb_value)
+    # Patch map_value in image
+    monkeypatch.setattr(image, "map_rgb_value", fake_map_rgb_value)
 
     # Call convert_to_ascii with a specific mode
-    aart.convert_to_ascii(str(img_path), mode="color")
+    image.convert_to_ascii(str(img_path), mode="color")
 
     # Check that the patched function was called
     assert was_called
@@ -96,7 +96,7 @@ def test_calculate_new_size_fits_width():
     # Image fits within width, not too tall
     w, h = 100, 50
     max_w, max_h = 80, 40
-    new_w, new_h = aart.calculate_new_size(w, h, max_w, max_h, 0.5)
+    new_w, new_h = image.calculate_new_size(w, h, max_w, max_h, 0.5)
     assert new_w <= max_w
     assert new_h <= max_h
     assert new_w > 0 and new_h > 0
@@ -106,7 +106,7 @@ def test_calculate_new_size_fits_height():
     # Image would be too tall, so width is reduced
     w, h = 100, 200
     max_w, max_h = 80, 40
-    new_w, new_h = aart.calculate_new_size(w, h, max_w, max_h, 0.5)
+    new_w, new_h = image.calculate_new_size(w, h, max_w, max_h, 0.5)
     assert new_w <= max_w
     assert new_h <= max_h
     assert new_w > 0 and new_h > 0
@@ -116,7 +116,7 @@ def test_calculate_new_size_square():
     # Square image, square terminal
     w, h = 50, 50
     max_w, max_h = 50, 50
-    new_w, new_h = aart.calculate_new_size(w, h, max_w, max_h, 1.0)
+    new_w, new_h = image.calculate_new_size(w, h, max_w, max_h, 1.0)
     assert new_w <= max_w
     assert new_h <= max_h
     assert new_w > 0 and new_h > 0
@@ -125,23 +125,23 @@ def test_calculate_new_size_square():
 def test_get_all_pixels_len():
     # Create a test image
     img = Image.new("L", (30, 30), 128)
-    pixels = aart.get_all_pixels(img, 10, 10, 20, 20)
+    pixels = image.get_all_pixels(img, 10, 10, 20, 20)
     assert len(pixels) == 100  # 10x10 image should have 100 pixels
 
 
 def test_enhance_gamma_value_0():
-    assert aart.enhance_gamma_value(0) == 0
+    assert image.enhance_gamma_value(0) == 0
 
 
 def test_enhance_gamma_value_255():
-    assert aart.enhance_gamma_value(255) == 255
+    assert image.enhance_gamma_value(255) == 255
 
 
 def test_enhance_gamma_value_midpoint():
     # I'm not sure I'm even going to use this,
     # and when I was I used a gamma of 0.2,
     # but let's get the test to pass in case we need it later.
-    assert aart.enhance_gamma_value(128, gamma=0.41) == 192
+    assert image.enhance_gamma_value(128, gamma=0.41) == 192
 
 
 def test_logo():
@@ -154,7 +154,7 @@ def test_logo():
     sys.stdout = io.StringIO()
 
     # Convert the image to ASCII art and print to stdout
-    aart.convert_to_ascii(
+    image.convert_to_ascii(
         R"tests\logo.gif",
         mode="color",
         alphabet_name="ultra-wide",
@@ -184,4 +184,4 @@ def test_logo():
 
 def test_example_jpg():
     # this is just making sure this runs without error
-    aart.convert_to_ascii(R"tests\pexels-creationhill-1681010.jpg", mode="color")
+    image.convert_to_ascii(R"tests\pexels-creationhill-1681010.jpg", mode="color")
