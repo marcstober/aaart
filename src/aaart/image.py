@@ -1,4 +1,3 @@
-import argparse
 import numbers
 import shutil
 import sys
@@ -289,7 +288,7 @@ def convert_to_ascii(
     # get the size in columns of the current terminal
     # and resize the image accordingly
     terminal_size = shutil.get_terminal_size()
-    max_width = terminal_size.columns
+    max_width = width or terminal_size.columns
     max_height = terminal_size.lines - 2  # -2 for prompt
 
     # calculation in Get-CharacterSize.ps1
@@ -770,4 +769,5 @@ def convert_to_ascii_with_args(args):
         alphabet_name=args.alphabet,
         mode=args.mode,
         colors=args.color,
+        width=args.width,
     )

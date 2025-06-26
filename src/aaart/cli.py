@@ -17,7 +17,7 @@ from .image import (
 
 def main():
     # TODO: Also use argparse for this?
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Another ASCII Art program (aaart)")
     parser.add_argument("command", choices=["text", "image"], help="Command to run")
     parser.add_argument(
         "args", nargs=argparse.REMAINDER, help="Arguments for the command"
@@ -31,6 +31,8 @@ def main():
 
 def image_main(raw_args):
     # TODO: move this back into image.py?
+    # TODO: consider using argparse's subparsers: https://docs.python.org/3/library/argparse.html#other-utilities
+    #   (But actually, I like it this way, because I could move subcommands with their argument parses to their own files.)
     parser = argparse.ArgumentParser(description="Convert image to ASCII art.")
     parser.add_argument("image_path", help="Path to the input image file")
     # parser.add_argument(
@@ -57,6 +59,12 @@ def image_main(raw_args):
         help="color to use in monotone mode",
     )
     parser.add_argument(
+        "--width",
+        "-w",
+        type=int,
+        help="Width of the output ASCII art (default: terminal width)",
+    )
+    parser.add_argument(
         "--debug",
         action="store_true",
         help="Enable debug output",
@@ -76,7 +84,7 @@ def image_main(raw_args):
 def text_main(raw_args):
     # the arguments are *mostly* a subset of pyfiglet's
     parser = argparse.ArgumentParser(description="Convert text to ASCII art.")
-    parser.add_argument("text", help="Text to convert to ASCII art", nargs="*")
+    parser.add_argument("text", help="Text to convert to ASCII art", nargs="+")
     parser.add_argument(
         "--font",
         "-f",

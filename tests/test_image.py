@@ -92,6 +92,33 @@ def test_convert_to_ascii_with_mode_color(monkeypatch, tmp_path):
     assert was_called
 
 
+def test_convert_to_ascii_with_width(tmp_path):
+    # Create a test image
+    img_path = tmp_path / "test_img.png"
+    create_test_image(img_path)
+
+    # Redirect stdout to capture output
+    old_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+
+    # Call convert_to_ascii with a specific width
+    image.convert_to_ascii(str(img_path), width=20)
+
+    # Get the output and restore stdout
+    ascii_output = sys.stdout.getvalue()
+    sys.stdout = old_stdout
+
+    # Check that the output is not empty
+    assert ascii_output.strip() != ""
+    # Check that the width of the output is as expected
+    lines = ascii_output.splitlines()
+    assert all(len(line) <= 20 for line in lines)
+
+    # make sure the height is proportional
+    # the test image is a square and character_aspect_ratio is 0.47
+    assert len(lines) == round(20 * 0.47)
+
+
 def test_calculate_new_size_fits_width():
     # Image fits within width, not too tall
     w, h = 100, 50
