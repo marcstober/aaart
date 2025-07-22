@@ -1,4 +1,4 @@
-Another ASCCII Art program
+# Another ASCCII Art program
 
 The purpose of this program, as distinguished from any other ASCII art program,
 is that it's an educational program to teach how to use command-line tools.
@@ -10,7 +10,7 @@ The image command is trying to give output similar to https://github.com/khrome/
 
 The text command is a wrapper around pyfiglet.
 
-# Installing
+## Installing
 
 NOTE: This package currently not open source or published publicly (i.e., on PyPI).
 
@@ -20,7 +20,7 @@ pip install path/to/aaart-version.whl
 
 Replace the path and filename with that of the actual wheel file.
 
-# Building
+## Building
 
 Using `uv`:
 
@@ -29,9 +29,9 @@ Using `uv`:
 uv build
 ```
 
-# Testing
+## Testing
 
-## Smoke test for developers
+### Smoke test for developers
 
 ```powershell
 # in the directory where the pyproject.toml file is
@@ -45,8 +45,10 @@ Run automated tests:
 pytest
 ```
 
-# TODO
+## TODO
 
+-   Add an Open Source license (first, think about if there are any issues with this?).
+-   Publish to PyPi.
 -   Support HEIC and maybe even SVG files (and potentially other formats).
 
 # Credits
