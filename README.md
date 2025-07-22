@@ -49,6 +49,7 @@ pytest
 
 -   Add an Open Source license (first, think about if there are any issues with this?).
 -   Publish to PyPi.
+-   I'm not sure I like "\_\_all\_\_" for previewing all fonts. Maybe `--font-list` to list the font names and `--font-test` to view the text in all font? Note that the would be musically exclusive w/other parameters (in particular, `--font`).
 -   Support HEIC and maybe even SVG files (and potentially other formats).
 
 # Credits
